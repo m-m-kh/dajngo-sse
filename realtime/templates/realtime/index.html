@@ -1,0 +1,45 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://unpkg.com/htmx.org@1.1.0"></script>
+    <title>Title</title>
+</head>
+<body>
+<form method="post">
+{% csrf_token %}
+{{ form }}
+    <button type="submit">send</button>
+</form>
+
+<script >
+const form = document.querySelector('form')
+const formm = document.getElementsByTagName('form');
+form.addEventListener('submit', e => {
+    e.preventDefault()
+    const formdata = new FormData(form)
+
+    {#formdata.append()#}
+    fetch('/t1/',{
+        method: 'post',
+        body: formdata
+    })
+
+    }
+
+)
+
+const eventSource = new EventSource('/event/');
+
+eventSource.onmessage = function(event) {
+    console.log('Received message:', event.data);
+    // Handle received data as per your requirement
+};
+
+
+</script>
+{#<script src="{% static 'realtime/mainn.js' %}"></script>#}
+</body>
+</html>
