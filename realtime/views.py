@@ -10,19 +10,34 @@ import time
 from django.http import StreamingHttpResponse
 import random
 from asgiref.sync import sync_to_async
-async def sse(request, *args, **kwargs):
-    async def event_stream():
+from django.dispatch import receiver
+from django.db.models import signals
 
+# class FutureWrapper:
+#     def __init__(self):
+#         self.future = asyncio.Future()
+# 
+#     def generate(self):
+#         self.future = asyncio.Future()
+async def sse(request, *args, **kwargs):
+    future = asyncio.Event()
+
+    @receiver(signal=signals.post_save, sender=models.TestModel)
+    def send_notification(sender, instance, created, **kwargs):
+        if created:
+            future.set()
+
+    async def event_stream():
         while True:
-            model = await sync_to_async(list)(models.TestModel.objects.all())
-            for obj in model:
-                yield "data: {}\n\n".format(obj.name)
-                await asyncio.sleep(1)
-        # i = 0
-        # while True:
-        #     yield f'data: {random.choice(emojis)} {i}\n\n'
-        #     i += 1
-        #     await asyncio.sleep(1)
+            await future.wait()
+            model = await models.TestModel.objects.alast()
+            yield "data: {}\n\n".format(model.name)
+            if future.is_set():
+                future.clear()
+
+
+
+
     r = StreamingHttpResponse(event_stream(), content_type='text/event-stream')
     r['Cache-Control'] = 'no-cache'
     r['Connection'] = 'keep-alive'
@@ -38,3 +53,4 @@ def t1(request):
 
     context = {'form': form}
     return shortcuts.render(request, 'realtime/index.html', context=context)
+
