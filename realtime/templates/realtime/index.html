@@ -8,35 +8,34 @@
     <title>Title</title>
 </head>
 <body>
-<form method="post">
-{% csrf_token %}
-{{ form }}
+<form action="{% url 'test' %}" method="post">
+    {% csrf_token %}
+    {{ form }}
     <button type="submit">send</button>
 </form>
 
-<script >
-const form = document.querySelector('form')
-const formm = document.getElementsByTagName('form');
-form.addEventListener('submit', e => {
-    e.preventDefault()
-    const formdata = new FormData(form)
+<script>
+    const form = document.querySelector('form')
+    const formm = document.getElementsByTagName('form');
+    form.addEventListener('submit', e => {
+            e.preventDefault()
+            const formdata = new FormData(form)
 
-    {#formdata.append()#}
-    fetch('/t1/',{
-        method: 'post',
-        body: formdata
-    })
+            {#formdata.append()#}
+            fetch('/event/', {
+                method: 'post',
+                body: formdata
+            })
 
-    }
+        }
+    )
 
-)
+    const eventSource = new EventSource('/event/');
 
-const eventSource = new EventSource('/event/');
-
-eventSource.onmessage = function(event) {
-    console.log('Received message:', event.data);
-    // Handle received data as per your requirement
-};
+    eventSource.onmessage = function (event) {
+        console.log('Received message:', event.data);
+        // Handle received data as per your requirement
+    };
 
 
 </script>
