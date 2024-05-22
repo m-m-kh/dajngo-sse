@@ -8,7 +8,7 @@
     <title>Title</title>
 </head>
 <body>
-<form action="{% url 'test' %}" method="post">
+<form  method="post">
     {% csrf_token %}
     {{ form }}
     <button type="submit">send</button>
@@ -22,7 +22,7 @@
             const formdata = new FormData(form)
 
             {#formdata.append()#}
-            fetch('/event/', {
+            fetch('{% url 'test' id %}', {
                 method: 'post',
                 body: formdata
             })
@@ -30,7 +30,7 @@
         }
     )
 
-    const eventSource = new EventSource('/event/');
+    const eventSource = new EventSource('{% url 'test' id %}');
 
     eventSource.onmessage = function (event) {
         console.log('Received message:', event.data);
